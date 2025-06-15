@@ -2,11 +2,11 @@ import streamlit as st
 import cohere
 import random
 
-# === CONFIG ===
-API_KEY = "NqlA14E56zjy0pLeZDecPtpPYuiAPtr0sa1uF0FR"  # Replace with your Cohere key
+# === API CONFIG ===
+API_KEY = "NqlA14E56zjy0pLeZDecPtpPYuiAPtr0sa1uF0FR"
 co = cohere.Client(API_KEY)
 
-# === Emotion Mapping ===
+# === SPOTIFY PLAYLIST MAP ===
 spotify_playlists = {
     "happy": "https://open.spotify.com/embed/playlist/37i9dQZF1DXdPec7aLTmlC",
     "sad": "https://open.spotify.com/embed/playlist/37i9dQZF1DX7qK8ma5wgG1",
@@ -17,135 +17,111 @@ spotify_playlists = {
     "motivated": "https://open.spotify.com/embed/playlist/37i9dQZF1DXc6IFF23C9jj",
     "confused": "https://open.spotify.com/embed/playlist/37i9dQZF1DWUvZBXGjNCU4",
     "depressed": "https://open.spotify.com/embed/playlist/37i9dQZF1DX3YSRoSdA634",
+    "joyful": "https://open.spotify.com/embed/playlist/37i9dQZF1DWYBO1MoTDhZI",
+    "pleasant": "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYpdgoIcn6",
+    "anxious": "https://open.spotify.com/embed/playlist/37i9dQZF1DWVrtsSlLKzro",
+    "irritated": "https://open.spotify.com/embed/playlist/37i9dQZF1DWU4EQPjP9ZpS",
+    "not sure": "https://open.spotify.com/embed/playlist/37i9dQZF1DX1s9knjP51Oa",
+    "don't know": "https://open.spotify.com/embed/playlist/37i9dQZF1DX2sUQwD7tbmL",
+    "not happy not sad": "https://open.spotify.com/embed/playlist/37i9dQZF1DX3rxVfibe1L0",
     "random": random.choice([
-        "https://open.spotify.com/embed/playlist/37i9dQZF1DX2sUQwD7tbmL",
-        "https://open.spotify.com/embed/playlist/37i9dQZF1DX1s9knjP51Oa"
+        "https://open.spotify.com/embed/playlist/37i9dQZF1DWXT8uSSn6PRy",
+        "https://open.spotify.com/embed/playlist/37i9dQZF1DX4UtSsGT1Sbe"
     ])
 }
 
+# === EMOTION MAP ===
 emotion_map = {
-    "excited": "happy", "joyful": "happy", "grateful": "happy", "pleasant": "happy",
-    "tired": "calm", "relaxed": "calm", "peaceful": "calm", "not happy not sad": "calm",
-    "angry": "angry", "frustrated": "angry", "annoyed": "angry", "irritated": "angry",
+    "excited": "happy", "joyful": "joyful", "grateful": "happy",
+    "tired": "calm", "relaxed": "calm", "peaceful": "calm", "pleasant": "pleasant",
+    "angry": "angry", "frustrated": "angry", "annoyed": "angry", "irritated": "irritated",
     "sad": "sad", "upset": "sad", "lonely": "sad",
     "romantic": "romantic", "loved": "romantic",
     "energetic": "energetic", "motivated": "motivated",
-    "depressed": "depressed", "confused": "confused", "anxious": "confused",
+    "depressed": "depressed", "confused": "confused", "anxious": "anxious",
+    "not sure": "not sure", "don't know": "don't know", "not happy not sad": "not happy not sad",
     "random": "random"
 }
 
-# === STYLING ===
+# === PAGE CONFIG ===
+st.set_page_config(page_title="MoodMate 🎧", layout="wide")
+
+# === CUSTOM CSS ===
 st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Rubik:wght@400;600&display=swap');
-
-    html, body, .stApp {
-        background: linear-gradient(to right, #fdfbfb, #ebedee);
-        font-family: 'Rubik', sans-serif;
-        color: #2c2c2c;
-    }
-
-    .title {
-        text-align: center;
-        font-size: 3em;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 700;
-        color: #5e60ce;
-        margin-top: 20px;
-    }
-
-    .subtitle {
-        text-align: center;
-        font-size: 1.2em;
-        font-weight: 400;
-        color: #5e60ce;
-        margin-bottom: 30px;
-    }
-
-    .stTextInput textarea, .stTextArea textarea {
-        background-color: #ffffff;
-        border-radius: 10px;
-        border: 2px solid #cdb4db;
-        padding: 12px;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .stButton > button {
-        background-color: #5e60ce;
-        color: white;
-        padding: 12px 28px;
-        font-size: 18px;
-        border-radius: 12px;
-        border: none;
-        transition: 0.3s ease;
-        box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .stButton > button:hover {
-        background-color: #6930c3;
-        transform: scale(1.05);
-    }
-
-    .result-text {
-        font-size: 22px;
-        font-weight: 600;
-        color: #6930c3;
-        padding-top: 20px;
-    }
-
-    iframe {
-        border-radius: 16px;
-        margin-top: 20px;
-        box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
-    }
-
-    footer {
-        margin-top: 40px;
-        text-align: center;
-        font-size: 14px;
-        color: #555;
-    }
-    </style>
+<style>
+body {
+    background-color: #1e1e2f;
+    font-family: 'Poppins', sans-serif;
+    color: #f8f9fa;
+}
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1f1f1;
+}
+.big-title {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 0;
+    color: #fca311;
+}
+.subtle {
+    font-size: 18px;
+    color: #adb5bd;
+}
+.stTextArea > div > textarea {
+    background-color: #2a2a3b;
+    color: #ffffff;
+    font-size: 18px;
+    border: 1px solid #444;
+    border-radius: 10px;
+}
+button[kind="primary"] {
+    background: linear-gradient(45deg, #ff6f61, #ffcc70);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 14px rgba(255, 105, 135, .3);
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
-# === TITLE ===
-st.markdown('<div class="title">MoodMate 🎧</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Your AI-powered music buddy that matches your vibe ✨</div>', unsafe_allow_html=True)
+# === HEADER ===
+st.markdown("<h1 class='big-title'>MoodMate</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtle'>AI-Powered Music Mood Recommender 🎧</p>", unsafe_allow_html=True)
+st.markdown("---")
 
 # === USER INPUT ===
-user_input = st.text_area("How are you feeling today?", height=120, placeholder="e.g., I feel anxious and need some clarity.")
+user_input = st.text_area("💬 What's your current mood or feeling?", height=150, placeholder="Type how you feel...")
 
-# === BUTTON & RESPONSE ===
-if st.button("🎶 Recommend Me Music"):
+# === ANALYSIS ===
+if st.button("🔍 Analyze & Recommend"):
     if user_input.strip():
-        with st.spinner("Analyzing your emotion..."):
+        with st.spinner("Thinking like your emotional bestie..."):
+            prompt = f"From this text, extract a single word that reflects the mood (happy, sad, calm, romantic, energetic, confused, depressed, etc.):\n\n\"{user_input.strip()}\""
             try:
-                prompt = f"Identify the emotion behind this sentence in one word (like happy, sad, angry, calm, romantic, energetic, confused, depressed):\n\n\"{user_input.strip()}\"\n\nOnly reply with the emotion word."
                 response = co.generate(
                     model="command-r-plus",
                     prompt=prompt,
-                    max_tokens=10,
-                    temperature=0.5
+                    max_tokens=8,
+                    temperature=0.6
                 )
                 raw_emotion = response.generations[0].text.strip().lower()
-                core_emotion = emotion_map.get(raw_emotion, raw_emotion)
+                mapped_emotion = emotion_map.get(raw_emotion, "random")
 
-                st.markdown(f"<div class='result-text'>🎯 Detected Mood: <b>{core_emotion.capitalize()}</b></div>", unsafe_allow_html=True)
+                st.success(f"✨ Mood Detected: **{mapped_emotion.title()}**")
+                st.markdown("### 🎵 Your Vibe Tracklist")
+                st.components.v1.iframe(spotify_playlists[mapped_emotion], height=400)
 
-                playlist_url = spotify_playlists.get(core_emotion)
-                if playlist_url:
-                    st.components.v1.iframe(playlist_url, height=380)
-                else:
-                    st.warning("No playlist found. Try expressing your mood in simpler words.")
             except Exception as e:
-                st.error(f"Something went wrong: {e}")
+                st.error(f"Something went wrong 😔: {e}")
     else:
-        st.warning("Please describe your mood to get a music suggestion.")
+        st.warning("Please describe your mood to get a song vibe!")
 
 # === FOOTER ===
-st.markdown("""
-    <footer>
-        Made with 💜 by Vicky | AI x Spotify = Pure Vibes 💫
-    </footer>
-""", unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("<center><span class='subtle'>Designed with ❤️ by Vicky | MoodMate 2025</span></center>", unsafe_allow_html=True)
