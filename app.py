@@ -1,13 +1,12 @@
-# MoodMate: Enhanced Version with Spotify Login and Theme Toggle
 import streamlit as st
 import cohere
 import random
 
-# === CONFIGURATION ===
-API_KEY = "NqlA14E56zjy0pLeZDecPtpPYuiAPtr0sa1uF0FR"  # 🔁 Replace with your Cohere API key
+# === CONFIG ===
+API_KEY = "NqlA14E56zjy0pLeZDecPtpPYuiAPtr0sa1uF0FR"  # Replace with your Cohere key
 co = cohere.Client(API_KEY)
 
-# === Emotion to Spotify Playlist Mapping ===
+# === Emotion Mapping ===
 spotify_playlists = {
     "happy": "https://open.spotify.com/embed/playlist/37i9dQZF1DXdPec7aLTmlC",
     "sad": "https://open.spotify.com/embed/playlist/37i9dQZF1DX7qK8ma5wgG1",
@@ -25,66 +24,102 @@ spotify_playlists = {
 }
 
 emotion_map = {
-    "excited": "happy", "joyful": "happy", "grateful": "happy",
-    "tired": "calm", "relaxed": "calm", "peaceful": "calm",
-    "angry": "angry", "frustrated": "angry", "annoyed": "angry",
+    "excited": "happy", "joyful": "happy", "grateful": "happy", "pleasant": "happy",
+    "tired": "calm", "relaxed": "calm", "peaceful": "calm", "not happy not sad": "calm",
+    "angry": "angry", "frustrated": "angry", "annoyed": "angry", "irritated": "angry",
     "sad": "sad", "upset": "sad", "lonely": "sad",
     "romantic": "romantic", "loved": "romantic",
     "energetic": "energetic", "motivated": "motivated",
-    "depressed": "depressed", "confused": "confused",
+    "depressed": "depressed", "confused": "confused", "anxious": "confused",
     "random": "random"
 }
 
-# === THEME SELECTION ===
-theme = st.radio("Select Theme", ["🌙 Dark", "☀️ Light"], horizontal=True)
+# === STYLING ===
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Rubik:wght@400;600&display=swap');
 
-if theme == "🌙 Dark":
-    st.markdown("""
-        <style>
-            html, body {
-                background: linear-gradient(135deg, #2B2E4A, #1B1B2F);
-                color: white;
-            }
-            .stTextInput > div > div > input {
-                background-color: #333333;
-                color: white;
-            }
-            .stButton > button {
-                background-color: #E84545;
-                color: white;
-                border-radius: 12px;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-        <style>
-            html, body {
-                background: linear-gradient(135deg, #f6d365, #fda085);
-            }
-            .stTextInput > div > div > input {
-                background-color: white;
-                color: black;
-            }
-            .stButton > button {
-                background-color: #007BFF;
-                color: white;
-                border-radius: 12px;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+    html, body, .stApp {
+        background: linear-gradient(to right, #fdfbfb, #ebedee);
+        font-family: 'Rubik', sans-serif;
+        color: #2c2c2c;
+    }
 
-# === HEADER ===
-st.title("🎧 MoodMate – AI Mood Music Recommender")
-st.markdown("#### 🧠 Tell me how you're feeling and I'll recommend your vibe!")
+    .title {
+        text-align: center;
+        font-size: 3em;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        color: #5e60ce;
+        margin-top: 20px;
+    }
 
-# === TEXT INPUT ===
-user_input = st.text_area("💬 How are you feeling today?", height=120, placeholder="E.g., I feel low and need a boost.")
+    .subtitle {
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: 400;
+        color: #5e60ce;
+        margin-bottom: 30px;
+    }
 
-# === RECOMMENDATION LOGIC ===
-if st.button("🎶 Get My Vibe"):
+    .stTextInput textarea, .stTextArea textarea {
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 2px solid #cdb4db;
+        padding: 12px;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .stButton > button {
+        background-color: #5e60ce;
+        color: white;
+        padding: 12px 28px;
+        font-size: 18px;
+        border-radius: 12px;
+        border: none;
+        transition: 0.3s ease;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .stButton > button:hover {
+        background-color: #6930c3;
+        transform: scale(1.05);
+    }
+
+    .result-text {
+        font-size: 22px;
+        font-weight: 600;
+        color: #6930c3;
+        padding-top: 20px;
+    }
+
+    iframe {
+        border-radius: 16px;
+        margin-top: 20px;
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
+    }
+
+    footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 14px;
+        color: #555;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# === TITLE ===
+st.markdown('<div class="title">MoodMate 🎧</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Your AI-powered music buddy that matches your vibe ✨</div>', unsafe_allow_html=True)
+
+# === USER INPUT ===
+user_input = st.text_area("How are you feeling today?", height=120, placeholder="e.g., I feel anxious and need some clarity.")
+
+# === BUTTON & RESPONSE ===
+if st.button("🎶 Recommend Me Music"):
     if user_input.strip():
-        with st.spinner("Analyzing your mood..."):
+        with st.spinner("Analyzing your emotion..."):
             try:
                 prompt = f"Identify the emotion behind this sentence in one word (like happy, sad, angry, calm, romantic, energetic, confused, depressed):\n\n\"{user_input.strip()}\"\n\nOnly reply with the emotion word."
                 response = co.generate(
@@ -96,29 +131,21 @@ if st.button("🎶 Get My Vibe"):
                 raw_emotion = response.generations[0].text.strip().lower()
                 core_emotion = emotion_map.get(raw_emotion, raw_emotion)
 
-                st.markdown(f"### 🎯 Detected Mood: **{core_emotion.capitalize()}**")
+                st.markdown(f"<div class='result-text'>🎯 Detected Mood: <b>{core_emotion.capitalize()}</b></div>", unsafe_allow_html=True)
 
                 playlist_url = spotify_playlists.get(core_emotion)
                 if playlist_url:
-                    st.markdown("### 🎵 Here's your playlist:")
                     st.components.v1.iframe(playlist_url, height=380)
                 else:
-                    st.warning("❌ No matching playlist found. Try describing your mood differently!")
-
+                    st.warning("No playlist found. Try expressing your mood in simpler words.")
             except Exception as e:
-                st.error(f"❌ Something went wrong: {e}")
+                st.error(f"Something went wrong: {e}")
     else:
-        st.warning("Please describe your mood first.")
+        st.warning("Please describe your mood to get a music suggestion.")
 
 # === FOOTER ===
 st.markdown("""
-    <hr>
-    <center>
-        Made with ❤️ by Vicky | AI + Spotify = MoodMate 🎧
-    </center>
+    <footer>
+        Made with 💜 by Vicky | AI x Spotify = Pure Vibes 💫
+    </footer>
 """, unsafe_allow_html=True)
-
-# === TO-DO ===
-# ✅ Add Spotify OAuth integration (currently skipped due to token/security complexity)
-# ✅ Added Dark/Light mode toggle
-# ✅ Extended emotion detection to include confused, depressed, random, motivated
